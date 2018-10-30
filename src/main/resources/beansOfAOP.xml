@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress ALL -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+    <!--被代理的目标对象 -->
+    <bean id="SingStar" class="Entities.SingStar"></bean>
+    <!--<bean id="Star" class="Entities.Star"></bean>-->
+    <!-- 通知 -->
+    <bean id="advices" class="Aop.Advices"></bean>
+    <!-- AOP配置 -->
+    <!-- proxy-target-class属性表示被代理的类是否为一个没有实现接口的类，Spring会依据实现了接口则使用JDK内置的动态代理，如果未实现接口则使用cglib -->
+    <aop:config proxy-target-class="true">
+        <!-- 切面配置 -->
+        <!--ref表示通知对象的引用 -->
+        <aop:aspect ref="advices">
+            <!-- 配置切入点(横切逻辑将注入的精确位置) -->
+            <aop:pointcut expression="execution(public * Entities..* .sing*(..))" id="pointcut1"/>
+
+            <!--声明通知，method指定通知类型，pointcut指定切点，就是该通知应该注入那些方法中 -->
+            <aop:before method="beforeMethod" pointcut-ref="pointcut1"></aop:before>
+            <aop:after method="afterMethod" pointcut-ref="pointcut1"></aop:after>
+
+           <aop:around method="aroundMethod" pointcut="execution(public * Entities..*.sing*(..))"/>
+
+            <aop:after-throwing method="afterThrowing" pointcut="execution(public * Entities..*.sing*(..))" throwing="ex"/>
+
+            <aop:after-returning method="afterReturning" pointcut="execution(public * Entities..*.sing*(..))" returning="result"/>
+
+        </aop:aspect>
+    </aop:config>
+</beans>
